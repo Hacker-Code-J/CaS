@@ -58,6 +58,7 @@
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
     "stdio.h": "c",
-    "linear_analysis.h": "c"
+    "linear_analysis.h": "c",
+    "config.h": "c"
   }
 }

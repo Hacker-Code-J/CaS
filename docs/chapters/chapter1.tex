@@ -1,0 +1,310 @@
+\chapter{The Linear Approximation Table}
+
+We will define the \textbf{Linear Approximation Table} $\mathcal{L}$ of any S-Box. We abbreviate ``linear approximation table'' by \textbf{LAT}.
+
+Suppose we are given a S-Box $S$ takes $n$-bit sequences to $m$-bit sequences. The LAT $\mathcal{S}$ of $S$ is a table (or matrix) with $2^n$-rows and $2^m$-columns. The entries of the LAT $\mathcal{L}$ consist of integers. This includes both positive and negative integers,m as well as zero.
+
+\section{Motivation}
+
+We calculate the LAT's of the S-Box's used in given block cipher as the first step in designing an attack on that block cipher by linear cryptanalysis.
+
+How does the LAT of a S-Box reveal potential vulnerabilities of a block cipher that uses it in its design?
+%\vspace{4pt}
+\begin{tcolorbox}
+If the LAT of a S-box contain some ``large'' integer value (either positive or negative) then a block cipher that uses that S-Box may be vulnerable to an attack by linear cryptanalysis.
+\end{tcolorbox}
+
+\section{Preliminaries}
+\subsection{The Filed of Two Elements}
+Define $\F_2=\binaryfield$ to be the filed of two elements. We interpret $\F_2$ as the set of bits (zero and one). We have two binary operation on $\F_2$ namely \textbf{addition} and \textbf{multiplication}, so that $\F_2$ becomes a \textbf{field} under these operations.
+\begin{center}
+\begin{minipage}{.48\textwidth}
+\begin{itemize}
+	\item $\oplus:\F_2\times\F_2\to\F_2$.
+	\item The \textbf{addition operation} on $F_2$ is the logical operator XOR.
+	\item It is denoted by $\oplus$.
+\end{itemize}
+\begin{center}
+\begin{tabular}{c|c||c}
+	\toprule[1.2pt]
+	$x$ & $y$ & $x\oplus y$\\
+	\hline
+	0 & 0 & 0\\
+	\hline
+	0 & 1 & 1\\
+	\hline
+	1 & 0 & 1\\
+	\hline
+	1 & 1 & 0\\
+	\bottomrule[1.2pt]
+\end{tabular}
+\end{center}
+\end{minipage}
+\begin{minipage}{.48\textwidth}
+\begin{itemize}
+	\item $\&:\F_2\times\F_2\to\F_2$.
+	\item The \textbf{multiplication operation} on $F_2$ is the logical operator AND.
+	\item It is denoted by $\&$.
+\end{itemize}
+\begin{center}
+	\begin{tabular}{c|c||c}
+		\toprule[1.2pt]
+		$x$ & $y$ & $x\& y$ $(xy)$\\
+		\hline
+		0 & 0 & 0\\
+		\hline
+		0 & 1 & 0\\
+		\hline
+		1 & 0 & 0\\
+		\hline
+		1 & 1 & 1\\
+		\bottomrule[1.2pt]
+	\end{tabular}
+\end{center}
+\end{minipage}
+\end{center}
+
+\newpage
+\subsection{Sequences of Bits}
+By a sequence of bits, we mean a sequence of $0$'s and $1$'s. Define $\F_2^n$ to be the st of bit sequences of length $n$, where $n$ is a positive integer. \[
+\F_2^n=\set{(x_1,\dots,x_n): x_i\in\F_2}.
+\]
+\begin{tcolorbox}
+\begin{itemize}
+	\item $\F_2^n$ has $2^n$ elements.
+	\item $\F_2^n$ is in bijection with the set of integers $\set{0,1,\dots,2^n-1}$.
+\end{itemize}
+\end{tcolorbox}
+
+\subsection{The Dot Product}
+We can define the \textbf{dot product} operation, which is a map from $\F_2^n\times\F_2^n$ to $\F_2$. That is, \[
+\bullet:\F_2^n\times\F_2^n\to\F_2.
+\] We define dot product $x\cdot y\in\F_2$ by \[
+x\cdot y=\bigoplus_{i=1}^nx_iy_i,
+\] where $x=(x_1,\dots,x_n)$ and $y=(y_1,\dots,y_n)$ in $\F_2^n$.
+
+An expression that we will encounter in defining the linear approximation table is: \[
+(a\cdot x)\oplus(\beta\cdot y).
+\] Here $\alpha,x\in\F_2^n$ and $\beta,y\in\F_2^{m}$. Then
+\begin{align*}
+\begin{cases}
+\alpha\cdot x\in\F_2\\
+\beta\cdot y\in\F_2
+\end{cases}\implies
+(a\cdot x)\oplus(\beta\cdot y)\in\F_2.
+\end{align*}
+\vspace{12pt}
+\section{Definition of a S-Box}
+\begin{tcolorbox}[colback=white,colframe=defcolor,arc=5pt,title={\color{white}\bf S-BOX}]
+\begin{definition}
+	Let $n,m\in\Z^+$ be positive integers. Let $$
+	S:\F_2^n\to\F_2^m
+	$$ be any function. We call $S$ a \textbf{S-BOX}. Note that $n$ and $m$ represent the number of \textbf{input bits} \textbf{outputs bits}, respectively.
+\end{definition}
+\end{tcolorbox}
+\newpage
+\section{Linear Equations Associated to a S-Box}
+Let $S:\F_2^n\to\F_2^m$ be a given S-Box with $n$ input bits and $m$ output bits. Suppose $\alpha=(\alpha_1,\dots,\alpha_n)\in\F_2^n$ and $\beta=(\beta_1,\dots,\beta_m)\in\F_2^m$ are given. We are interested in solutions $x\in\F_2^n$ of the equation: \[
+(\alpha\cdot x)\oplus(\beta\cdot S(x)) = 0.
+\] We call $\alpha$ and $\beta$ the \textbf{masks} of the equation. $\alpha$ is the \textbf{input mask} and $\beta$ is the \textbf{output mask}.
+
+We can write \[
+S(x)=S(x_1,\dots, x_n)=y=(y_1,\dots, y_m)
+\] where $x_1,\dots,x_n\in\F_2$ are the \textbf{input variables} and $y_1,\dots,y_m\in\F_2$ are the \textbf{output variables}. Note that $y_i$ are not free variables but rather are determined by the choice of the free variables $x_i$.
+
+Then the equation $(\alpha\cdot x)\oplus(\beta\cdot S(x))=0$ can be written as: \[
+\left(\bigoplus_{i=1}^n\alpha_ix_i\right)\oplus\left(\bigoplus_{j=1}^m\beta_jy_j\right)=\left(\alpha_1x_1\oplus\cdots\oplus\alpha_nx_n\right)\oplus\left(\beta_1y_1\oplus\cdots\oplus\beta_my_m\right)=0.
+\] This is a \textbf{linear equation} of the input variables $x_1,\dots,x_n$ and the output variables $y_1,\dots,y_m$.
+
+Let $S:\F_2^n\to\F_2^m$ be a S-Box. For $\alpha\in\F_2^n$ and $\beta\in\F_2^m$, we define the set $\Sigma_{\alpha,\beta}$ by: \[
+\Sigma_{\alpha,\beta}=\set{x\in\F_2^n:(\alpha\cdot x)\oplus(\beta\cdot S(x))=0}.
+\] So, $\Sigma_{\alpha,\beta}$ is the set of all values $x\in\F_2^n$ that satisfy the linear equation: $(\alpha\cdot x)\oplus(\beta\cdot S(x))=0$.
+
+We also define the non-negative integer $e_{\alpha,\beta}$ to be the cardinality of the set $\Sigma_{\alpha,\beta}$, namely: \[
+e_{\alpha,\beta}=\abs{\Sigma_{\alpha,\beta}}.
+\] Since $\Sigma_{\alpha,\beta}$ is a subset of $\F_2^n$, and the cardinality of $\F_2^n$ is $2^n$, we get rough bound on $e_{\alpha,\beta}$ \[
+0\leq e_{\alpha,\beta}\leq 2^n.
+\]
+
+\newpage
+\section{Bias and Probability}
+In general if $p$ is a \textbf{probability} of an event then $p$ is a real number between $0$ and $1$, that is $0\leq p\leq 1$. From a given probability we can define an associated quantity called the \textbf{bias}, usually denoted $\epsilon$.
+
+\begin{tcolorbox}[colback=white,colframe=defcolor,arc=5pt,title={\color{white}\bf Bias}]
+\begin{definition}
+The bias $\epsilon$ is defined in terms of the probability $p$ by the formula \[
+\epsilon = p - \frac{1}{2}.
+\] Therefore, the bias is a real number in the range $-\frac{1}{2}\leq\epsilon\leq\frac{1}{2}$.
+\end{definition}
+\end{tcolorbox}
+So, a bias can be negative whereas a probability can not. Conversely, if we are given the bias $\epsilon$ then the associated probability $p$ is given by \[
+p=\epsilon+\frac{1}{2}.
+\] Just as $p=0$ and $p=1$ are the edge cases of a probability value, the values $\epsilon=-\frac{1}{2}$ and $\epsilon=\frac{1}{2}$ are the edge cases of a bias value.
+
+Note that a probability of $p=\frac{1}{2}$ has a bias of $\epsilon=0$. So, for example on the toss of a fair coin, both heads and tails have a bias $0$.
+
+\section{Linear Equations and Bias}
+Given $\alpha\in\F_2^n$ and $\beta\in\F_2^m$ we have defined number of $x\in\F_2^n$ which satisfy the equation $(\alpha\cdot x)\oplus(\beta\cdot S(x))=0$ to be $e_{\alpha,\beta}=\abs{\Sigma_{\alpha,\beta}}$. Therefore, the probability of $x\in\F_2^n$ satisfying the equation $(\alpha\cdot x)\oplus(\beta\cdot S(x))=0$ is: \[
+p_{\alpha,\beta}=\frac{\abs{\Sigma_{\alpha,\beta}}}{\abs{\F_2^n}}=\frac{e_{\alpha,\beta}}{2^n}.
+\] As with all probabilities we have $0\leq p_{\alpha,\beta}\leq 1$.
+
+So, the \textbf{bias} of the equation $(\alpha\cdot x)\oplus(\beta\cdot S(x))=0$ holding is: \[
+\epsilon_{\alpha,\beta}=p_{\alpha,\beta}-\frac{1}{2}.
+\] Since $p_{\alpha,\beta}=\frac{e_{\alpha,\beta}}{2^n}$ we can write the bias as \[
+\epsilon_{\alpha,\beta}=\frac{e_{\alpha,\beta}}{2^n}-\frac{1}{2}=\frac{e_{\alpha,\beta}-2^{n-1}}{2^n}.
+\] We call the numerator of this expression the \textbf{bias integer} associated to $\alpha$ and $\beta$ and denote it as: \[
+e'_{\alpha,\beta}=e_{\alpha,\beta}-2^{n-1}.
+\]
+
+Recall that $0\leq e_{\alpha,\beta}\leq 2^n$. Subtracting $2^{n-1}$ from this inequality gives:
+\begin{align*}
+0&\leq e_{\alpha,\beta}\leq 2^n\\
+0-2^{n-1}&\leq e_{\alpha,\beta}-2^{n-1}\leq 2^n-2^{n-1}\\
+-2^{n-1}&\leq e_{\alpha,\beta}-2^{n-1}\leq 2^n(1-2^{-1})\\
+-2^{n-1}&\leq e_{\alpha,\beta}-2^{n-1}\leq 2^{n-1}.
+\end{align*}
+Which gives us rough bounds for the possible values of the \textbf{bias integer} $e'_{\alpha,\beta}$ \[
+-2^{n-1}\leq e'_{\alpha,\beta}\leq 2^{n-1}.
+\] By definition, the bias is obtained from the bias integer by dividing it by $2^n$: \[
+\epsilon_{\alpha,\beta}=\frac{e'(\alpha,\beta)}{2^n}.
+\]
+
+\section{The LAT of a S-Box}
+\begin{tcolorbox}[colback=white,colframe=defcolor,arc=5pt,title={\color{white}\bf The Linear Approximation Table (LAT)}]
+\begin{definition}
+Let $S:\F_2^n\to\F_2^m$ be a S-Box. The \textbf{linear approximation table} (abbreviated \textbf{LAT}) of $S$ is a table of integers with $2^n$-rows and $2^m$-columns. We denote it by $\mathcal{L}$.
+\begin{itemize}
+	\item The rows are indexed by the elements $\alpha\in\F_2^n=\set{0,\dots,2^n-1}$.
+	\item The columns are indexed by the elements $\beta\in\F_2^m=\set{0,\dots,2^m-1}$.
+	\item The entry at row index $\alpha$ and column index $\beta$ is given by the bias integer $e'_{\alpha,\beta}$. \[
+	\mathcal{L}=(e'_{\alpha,\beta}).
+	\]
+\end{itemize}
+So, the LAT of a S-Box is just a table of all possible bias integer $e'_{\alpha,\beta}$.
+\end{definition}
+\end{tcolorbox}
+\begin{note}
+The \textbf{linear approximation table} $\mathcal{L}$ of a S-Box $S:\F_2^n\to\F_2^m$:
+\begin{table}[h!]\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{c||cccccc}
+	$\mathcal{L}$ & 0 & 1 & $\cdots$ & $\beta$ & $\cdots$ & $2^{m}-1$\\
+	\hline
+	\hline
+	0 & $2^{n-1}$ \\
+	1 & 0 \\
+	$\vdots$ &  \\
+	$\alpha$ & 0 & & & $e'_{\alpha,\beta}$& \\
+	$\vdots$ & \\
+	$2^n-1$ & 0 \\
+\end{tabular}
+\end{table}\\
+We will see that for any LAT the first column is all zeros except the first entry which is $2^{n-1}$.
+\end{note}
+
+\newpage
+\section{Properties of the LAT}
+We already proved that the entries $e'_{\alpha,\beta}$ of the LAT are integers between $-2^{n-1}$ and $2^{n-1}$. Consider the case $\alpha=0$ and $\beta=0$. Then every $x\in\F_2^n$ is a solution to $(\alpha\cdot x)\oplus(\beta\cdot S(x))=0$.
+Therefore, $\Sigma_{0,0}=\F_2^n$ and so $e_{0,0}=\abs{\F_2^n}=2^n$. The corresponding bias integer is \[
+e'_{0,0}=e_{0,0}-2^{n-1}=2^n-2^{n-1}=2^{n-1}.
+\] So, for any LAT, the value in the upper-left corner is always $2^{n-1}$.
+
+\begin{tcolorbox}[colback=white,colframe=lemcolor,arc=5pt,title={\color{white}\bf }]
+\begin{lemma}
+Let $\alpha\in\F_2^n$ with $\alpha\neq 0$ and $n>1$. Define the following subset of $\F_2^n$: \[
+W=\set{x\in\F_2^n:\alpha\cdot x=0}.
+\] Then the cardinality of $W$ is $2^{n-1}$.
+\end{lemma}
+\end{tcolorbox}
+\begin{proof}
+Since $\alpha=(\alpha_1,\dots,\alpha_n)\neq 0$, \[
+\exists i_0\in\set{1,\dots,n}:\alpha_{i_0}\neq 0.
+\] Assume that $i_0=1$. We can write \[
+\alpha=(1,\alpha')\quad\text{where}\quad\alpha'\in\F_2^{n-1}.
+\] Define a map \[
+\fullfunction{\phi}{\F_2^{n-1}}{W}{x}{(\alpha'\cdot x,x)}.
+\] Note that $\phi$ is well defined since \[
+\alpha\cdot\phi(x)=\alpha\cdot(\alpha'\cdot x, x)=(\alpha'\cdot x)\oplus(\alpha'\cdot x)=0.
+\] Since $\phi$ is bijection,  the cardinality of $W$ equals that of $\F_2^{n-1}$, which is $2^{n-1}$.
+\end{proof}
+
+Let us consider the values of the first column of the LAT (except for the first entry). This corresponds to the case $\alpha\neq 0$ and $\beta=0$. The equation $(\alpha\cdot x)\oplus(\beta\cdot S(x))=0$ becomes $\alpha\cdot x=0$. By the previous lemma the cardinality of the set of $x\in\F_2^n$ satisfying $\alpha\cdot x=0$ is $2^{n-1}$. Hence $e_{\alpha,0}=2^{n-1}$. And so, $$
+e'_{a,0}-2^{n-1}=2^{n-1}-2^{n-1}=0.
+$$ So, \hl{the first column of any LAT has its first entry as $2^{n-1}$ and then all zeros below that}. This case where $\beta=0$ is not of interest in applications since it does not involve the S-Box $S$.
+
+Suppose $S$ is a bijection (one-to-one and onto). Then necessarily $n=m$. So. \[
+S:\F_2^n\to\F_2^n\quad\text{and}S^{-1}:\F_2^n\to\F_2^n.
+\] Suppose $x\in\F_2^n$ and let $y=S(x)\in\F_2^n$. Then $x=S^{-1}(y)$. Then \[
+(\alpha\cdot x)\oplus(\beta\cdot S(x))=0\equiv(\beta\cdot y)\oplus(\alpha\cdot S^{-1}(y))=0.
+\] This shows that for any $\alpha$ and $\beta$, we have $e_{\alpha,\beta}^S=e_{\beta,\alpha}^{S^{-1}}$. Hence: \[
+\mathcal{L}_{S^{-1}}=(\mathcal{L}_S)^T.
+\] This says the LAT of $S^{-1}$ is the transpose of the LAT of $S$. Therefore, when $S$ is a bijection the first row and the first column are all zeros, except for the upper-left entry which is $2^{n-1}$.
+
+\newpage
+\begin{tcolorbox}[colback=white,colframe=lemcolor,arc=5pt,title={\color{white}\bf }]
+\begin{proposition}
+If $S:\F_2^n\to\F_2^n$ is a bijective S-Box and $n>1$ then the entries of the LAT are all \textbf{even integers}.
+\end{proposition}
+\end{tcolorbox}
+\begin{proof}
+	
+\end{proof}
+\newpage
+\section{Complexity}
+
+\newpage
+\section{S-Box Analysis}
+
+\begin{note}[\bf Parity Bits]
+Parity bits are a simple, yet powerful, method of error detection in digital communications and data storage. A parity bit is a bit that is added to a group of source bits to ensure that the number of set bits (i.e., bits with value 1) is even or odd.
+There are two types of parity bits:
+\begin{itemize}
+	\item \textbf{Even Parity}: The parity bit is set so that the total number of 1-bits in the code is even.
+	\item \textbf{Odd Parity}: The parity bit is set so that the total number of 1-bits in the code is odd.
+\end{itemize}
+The calculation of a parity bit depends on the desired parity (even or odd). For a given set of bits, the process is as follows:
+\begin{enumerate}
+	\item Count the number of bits set to 1 in the data.
+	\item For even parity, if the count is odd, set the parity bit to 1. If the count is even, set the parity bit to 0.
+	\item For odd parity, if the count is even, set the parity bit to 1. If the count is odd, set the parity bit to 0.
+\end{enumerate}
+Parity bits are widely used in various forms of data transmission and storage to detect errors. They are particularly useful in detecting single-bit errors.
+
+While parity bits can detect single-bit errors, they are not capable of detecting all types of errors, such as two-bit errors or the exact location of the error.
+Parity bits are a simple, yet powerful, method of error detection in digital communications and data storage. A parity bit is a bit that is added to a group of source bits to ensure that the number of set bits (i.e., bits with value 1) is even or odd. 
+\end{note}
+
+\begin{lstlisting}[style=C]
+int parity(int n) {
+	int count = 0;
+	while (n) {
+		count ^= n & 1;
+		n >>= 1;
+	}
+	return count;
+}
+\end{lstlisting}
+
+\newpage
+\begin{example}
+Consider \[
+\texttt{u8 s\_box[8] = \{0x7, 0x0, 0x6, 0x4, 0x5, 0x2, 0x1, 0x3\}};
+\] That is, \begin{align*}
+\texttt{000}&\mapsto\texttt{111}\\
+\texttt{001}&\mapsto\texttt{000}\\
+\texttt{010}&\mapsto\texttt{110}\\
+\texttt{011}&\mapsto\texttt{100}\\
+\texttt{100}&\mapsto\texttt{101}\\
+\texttt{101}&\mapsto\texttt{010}\\
+\texttt{110}&\mapsto\texttt{001}\\
+\texttt{111}&\mapsto\texttt{011}.
+\end{align*} Let $S(1,1,0) = (0,0,1)$ where \begin{align*}
+x_2=1,\quad x_1=1,\quad  x_0=0,\\
+y_2=0,\quad y_1=0,\quad  y_0=1.
+\end{align*}
+
+\[
+x_2+x_1+x_0=y_2+y_1+y_0
+\]
+
+\end{example}

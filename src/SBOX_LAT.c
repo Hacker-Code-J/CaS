@@ -2,6 +2,9 @@
 #include "linear_analysis.h"
 
 // Function to calculate the parity of a number
+// 1110 > 0 + 1 + 1 + 1 = 1
+// parity(n)= 1 if number of 1's is odd
+// parity(n)= 0 if number of 1's is even
 int parity(int n) {
     int count = 0;
     while (n) {
@@ -12,7 +15,7 @@ int parity(int n) {
 }
 
 // Function to generate the LAT
-void GEN_LAT(u8 SBOX[SBOX_SIZE], u8 LAT[SBOX_SIZE][SBOX_SIZE]) {
+void construct_LAT(u8 SBOX[SBOX_SIZE], u8 LAT[SBOX_SIZE][SBOX_SIZE]) {
     for (int input_mask = 0; input_mask < SBOX_SIZE; input_mask++) {
         for (int output_mask = 0; output_mask < SBOX_SIZE; output_mask++) {
             int count = 0;

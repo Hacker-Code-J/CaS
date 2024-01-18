@@ -18,7 +18,7 @@ TARGET=$(BINDIR)/SBOX_LAT
 all: dir $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) -o $@ $^ $(LDFLAGS)  # Corrected position for LDFLAGS
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 # Pattern rule for object files
 $(OBJDIR)/%.o: $(SRCDIR)/%.c

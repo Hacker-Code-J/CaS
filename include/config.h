@@ -3,7 +3,7 @@
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
-#define SBOX_SIZE 16
+#define SBOX_SIZE 8
 
 typedef uint8_t u8;
 typedef uint32_t u32;
