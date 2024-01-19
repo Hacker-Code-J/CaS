@@ -1,295 +1,118 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-#define MAX_EXPRESSIONS 100 // Maximum number of expressions
+int dot(int u, int v) {
+    int w = u & v;
+    int dot = 0;
 
-// Global variables
-int expressions[MAX_EXPRESSIONS][6];
-int idx = 0;
-
-// Modified findCombinations function
-void findCombinations(int x[], int y[], int sumX, int sumY, int index) {
-    if (index == 3) {
-        if (sumX == sumY && sumX > 0) {
-            expressions[idx][0] = x[0];
-            expressions[idx][1] = x[1];
-            expressions[idx][2] = x[2];
-            expressions[idx][3] = y[0];
-            expressions[idx][4] = y[1];
-            expressions[idx][5] = y[2];
-            idx++;
-        }
-        return;
+    // Using Kernighan's algorithm to count the number of set bits
+    while (w) {
+        dot ^= 1;
+        w &= w - 1;  // clear the least significant bit set
     }
-    for (int i = 0; i <= 1; i++) {
-        for (int j = 0; j <= 1; j++) {
-            x[index] = i;
-            y[index] = j;
-            findCombinations(x, y, sumX + i, sumY + j, index + 1);
-        }
-    }
+
+    return dot;
 }
 
-int main() {
-
-// Initialize the variables
-    int x2 = 1, x1 = 1, x0 = 0;
-    int y2 = 0, y1 = 0, y0 = 1;
-    
-    // Loop through all combinations of coefficients a2, a1, b0
-    for (int i = 0; i < 8; i++) { // Only need 8 combinations now
-        // Extract the bits of i to use as coefficients
-        int a2 = (i & 4) >> 2;
-        int a1 = (i & 2) >> 1;
-        int b0 = i & 1;
-        
-        // Check if at least one x and one y are present
-        if ((a2 == 0 && a1 == 0) || b0 == 0) {
-            // Skip this combination if it doesn't include at least one x and one y
-            continue;
-        }
-        
-        // Compute the linear expression parts
-        int xPart = (a2 & x2) ^ (a1 & x1);
-        int yPart = (b0 & y0);
-        
-        // Prepare strings to represent the x and y parts
-        char xString[5] = "";
-        if (a2) strcat(xString, "x2 ");
-        if (a1) strcat(xString, "x1 ");
-        char yString[5] = "y0 "; // yString is always "y0 " because y1 and y2 are 0
-        
-        // Print the equation
-        printf("%s= %s(Result: %d)\n", xString, yString, xPart ^ yPart);
-    }
-    
-    return 0;
-
-#if 0
-    // Define the 3-bit plaintext to ciphertext mapping
-    int mapping[8][2] = {
-        {0b000, 0b111}, // 000 -> 111
-        {0b001, 0b000}, // 001 -> 000
-        {0b010, 0b110}, // 010 -> 110
-        {0b011, 0b100}, // 011 -> 100
-        {0b100, 0b101}, // 100 -> 101
-        {0b101, 0b010}, // 101 -> 010
-        {0b110, 0b001}, // 110 -> 001
-        {0b111, 0b011}  // 111 -> 011
-    };
-
-    // Initialize variables
-    int x[3] = {0};
-    int y[3] = {0};
-
-    // Generate expressions
-    findCombinations(x, y, 0, 0, 0);
-
-    // Use the expressions array as needed
-    // Example: print the generated expressions
-    for (int i = 0; i < idx; i++) {
-        printf("%02d: (%d, %d, %d, %d, %d, %d)\n", i, expressions[i][0], expressions[i][1], expressions[i][2], expressions[i][3], expressions[i][4], expressions[i][5]);
-    }
-
-    // Further processing, such as evaluating these expressions against mappings, can be done here
-
-    // Iterate over each expression
-    for (int i = 0; i < 19; i++) {
-        int correctCount = 0;
-
-        // Iterate over all mappings
-        for (int j = 0; j < 8; j++) {
-            int x[3] = { (mapping[j][0] >> 2) & 1, (mapping[j][0] >> 1) & 1, mapping[j][0] & 1 };
-            int y[3] = { (mapping[j][1] >> 2) & 1, (mapping[j][1] >> 1) & 1, mapping[j][1] & 1 };
-            int lhs = x[0] * expressions[i][0] + x[1] * expressions[i][1] + x[2] * expressions[i][2];
-            int rhs = y[0] * expressions[i][3] + y[1] * expressions[i][4] + y[2] * expressions[i][5];
-
-            if (lhs == rhs) {
-                correctCount++;
-            }
-        }
-
-        // Print the number of times the expression is correct for all mappings
-        printf("Expression %d is correct %d times\n", i, correctCount);
-    }
-
-    return 0;
-#endif
+int success(int* S, int alpha, int beta, int n) {
+	int e = 0;
+	int range = 1 << n;  // 2 ** n
+	
+	for (int x = 0; x < range; x++) {
+		if ((dot(alpha, x) ^ dot(beta, S[x])) == 0) {
+			e++;
+		}
+	}
+	
+	return e;
 }
 
-#if 0
-#include <stdio.h>
-#include <stdint.h>
-
-#include "config.h"
-#include "linear_analysis.h"
-
-int idx = 0;
-
-void findCombinations(int x[], int y[], int sumX, int sumY, int index, int maxX, int maxY) {
-    if (index == 3) { // Base case: 3 digits processed
-        if (sumX == sumY && sumX > 0) { // Check if valid combination
-            printf("%02d: (%d, %d, %d, %d, %d, %d)\n", idx++, x[0], x[1], x[2], y[0], y[1], y[2]);
-        }
-        return;
-    }
-    // Recursive case: try all combinations for current index
-    for (int i = 0; i <= 1; i++) {
-        for (int j = 0; j <= 1; j++) {
-            x[index] = i;
-            y[index] = j;
-            findCombinations(x, y, sumX + i, sumY + j, index + 1, maxX, maxY);
-        }
-    }
+int bias_integer(int* S, int alpha, int beta, int n) {
+	int e = 0;
+	int range = 1 << n;  // 2 ** n
+	
+	for (int x = 0; x < range; x++) {
+		if ((dot(alpha, x) ^ dot(beta, S[x])) == 0) {
+			e++;
+		}
+	}
+	
+	return e - (range >> 1);  // range / 2 or 2 ** (n - 1)
 }
 
-// Function to evaluate direct assignment and negation expressions
-int evaluate_expression(int x, int y, int is_negation) {
-    return is_negation ? (x != y) : (x == y);
+int** lat(int* S, int n, int m) {
+	int n_range = 1 << n;
+	int m_range = 1 << m;
+	
+	// Dynamically allocate 2D array
+	int** L = (int**)malloc(n_range * sizeof(int*));
+	for (int i = 0; i < n_range; i++) {
+		L[i] = (int*)malloc(m_range * sizeof(int));
+	}
+	
+	// Compute the LAT
+	for (int alpha = 0; alpha < n_range; alpha++) {
+		for (int beta = 0; beta < m_range; beta++) {
+			L[alpha][beta] = success(S, alpha, beta, n);
+			// L[alpha][beta] = bias_integer(S, alpha, beta, n);
+		}
+	}
+	
+	return L;
 }
 
-int main() {
-    // Define the S-box according to the given rules
-    // u8 SBOX[SBOX_SIZE] = {0xA, 0x8, 0xF, 0x4, 0x2, 0x9, 0xE, 0xD, 0xC, 0xB, 0x6, 0x0, 0x5, 0x1, 0x3, 0x7};
-    u8 SBOX[SBOX_SIZE] = {0x7, 0x0, 0x6, 0x4, 0x5, 0x2, 0x1, 0x3};
+void print_lat(int* S, int n, int m) {
+    int n_range = 1 << n;
+    int m_range = 1 << m;
+    int** L = lat(S, n, m);
 
-    u8 LAT[SBOX_SIZE][SBOX_SIZE];
-    construct_LAT(SBOX, LAT);
+    // Print column headers
+    printf("     "); // Space for row header
+    for (int beta = 0; beta < m_range; beta++) {
+        printf("%02X ", beta);
+    }
+    printf("\n");
 
-    // Print the LAT
-    // printf("Linear Approximation Table (LAT):\n");
-    for (int i = 0; i < SBOX_SIZE; i++) {
-        for (int j = 0; j < SBOX_SIZE; j++) {
-            printf("%03d ", LAT[i][j]);
+    // Print a separator line
+    printf("   +"); // Alignment for row header
+    for (int beta = 0; beta < m_range; beta++) {
+        printf("---");
+    }
+    printf("\n");
+
+    for (int alpha = 0; alpha < n_range; alpha++) {
+        // Print row header
+        printf("%02X | ", alpha);
+
+        for (int beta = 0; beta < m_range; beta++) {
+            printf("%02d ", L[alpha][beta]);  // Right-align numbers in a field of width 2
         }
         printf("\n");
+
+        // Free memory for each row
+        free(L[alpha]);
     }
 
-    // Print the LAT with indices
-    // printf("Linear Approximation Table (LAT):\n");
-    // printf("   | ");
-    // for (int i = 0; i < SBOX_SIZE; i++) {
-    //     printf("%02X ", i);
-    // }
-    // printf("\n   -------------------------------------------------\n");
-
-    // for (int i = 0; i < SBOX_SIZE; i++) {
-    //     printf("%02X | ", i);
-    //     for (int j = 0; j < SBOX_SIZE; j++) {
-    //         printf("%02X ", LAT[i][j]);
-    //     }
-    //     printf("\n");
-    // }
-
-    // Define the 3-bit plaintext to ciphertext mapping
-    int mapping[8][2] = {
-        {0b000, 0b111}, // 000 -> 111
-        {0b001, 0b000}, // 001 -> 000
-        {0b010, 0b110}, // 010 -> 110
-        {0b011, 0b100}, // 011 -> 100
-        {0b100, 0b101}, // 100 -> 101
-        {0b101, 0b010}, // 101 -> 010
-        {0b110, 0b001}, // 110 -> 001
-        {0b111, 0b011}  // 111 -> 011
-    };
-
-    // int correctCount = 0;
-
-    // // Evaluate the expression x1 = y1 + 1 for each mapping
-    // for (int i = 0; i < 8; i++) {
-    //     int x = mapping[i][0]; // plaintext
-    //     int y = mapping[i][1]; // ciphertext
-
-    //     // Extract bits x1 and y1
-    //     int x1 = (x >> 1) & 1;
-    //     int y1 = (y >> 1) & 1;
-
-    //     // Check if the expression x1 = y1 + 1 is correct
-    //     if (x1 == ((y1 + 1) % 2)) {
-    //         correctCount++;
-    //     }
-    // }
-
-    // // Print the number of times the expression is correct
-    // printf("Expression 'x1 = y1 + 1' is correct %d times\n", correctCount);
-
-    // Iterate over all combinations of x2, x1, x0, y2, y1, y0
-    for (int x2 = 0; x2 <= 1; x2++) {
-        for (int x1 = 0; x1 <= 1; x1++) {
-            for (int x0 = 0; x0 <= 1; x0++) {
-                for (int y2 = 0; y2 <= 1; y2++) {
-                    for (int y1 = 0; y1 <= 1; y1++) {
-                        for (int y0 = 0; y0 <= 1; y0++) {
-                            // Check if the equation holds
-                            if (x2 + x1 + x0 == y2 + y1 + y0) {
-                                // Print the combination
-                                printf("(%d, %d, %d, %d, %d, %d)\n", x2, x1, x0, y2, y1, y0);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    int idx = 0;
-    printf("\nNew:\n");
-    // Iterate over all combinations of x2, x1, x0, y2, y1, y0
-    for (int x2 = 0; x2 <= 1; x2++) {
-        for (int x1 = 0; x1 <= 1; x1++) {
-            for (int x0 = 0; x0 <= 1; x0++) {
-                for (int y2 = 0; y2 <= 1; y2++) {
-                    for (int y1 = 0; y1 <= 1; y1++) {
-                        for (int y0 = 0; y0 <= 1; y0++) {
-                            // Ensure at least one of x and y is 1
-                            if ((x2 + x1 + x0 > 0) && (y2 + y1 + y0 > 0)) {
-                                // Check if the equation holds
-                                if (x2 + x1 + x0 == y2 + y1 + y0) {
-                                    // Print the combination
-                                    printf("%2d: (%d, %d, %d, %d, %d, %d)\n", idx++, x2, x1, x0, y2, y1, y0);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    idx = 0;
-    printf("\nNew Fn:\n");
-    int x[3] = {0}, y[3] = {0};
-    findCombinations(x, y, 0, 0, 0, 3, 3);
-
-    // Define the expressions
-    int expressions[19][6] = {
-        {0, 0, 1, 0, 0, 1}, {0, 0, 1, 0, 1, 0}, {0, 0, 1, 1, 0, 0},
-        {0, 1, 0, 0, 0, 1}, {0, 1, 0, 0, 1, 0}, {0, 1, 0, 1, 0, 0},
-        {0, 1, 1, 0, 1, 1}, {0, 1, 1, 1, 0, 1}, {0, 1, 1, 1, 1, 0},
-        {1, 0, 0, 0, 0, 1}, {1, 0, 0, 0, 1, 0}, {1, 0, 0, 1, 0, 0},
-        {1, 0, 1, 0, 1, 1}, {1, 0, 1, 1, 0, 1}, {1, 0, 1, 1, 1, 0},
-        {1, 1, 0, 0, 1, 1}, {1, 1, 0, 1, 0, 1}, {1, 1, 0, 1, 1, 0},
-        {1, 1, 1, 1, 1, 1}
-    };
-
-    // Iterate over each expression
-    for (int i = 0; i < 19; i++) {
-        int correctCount = 0;
-
-        // Iterate over all mappings
-        for (int j = 0; j < 8; j++) {
-            int x[3] = { (mapping[j][0] >> 2) & 1, (mapping[j][0] >> 1) & 1, mapping[j][0] & 1 };
-            int y[3] = { (mapping[j][1] >> 2) & 1, (mapping[j][1] >> 1) & 1, mapping[j][1] & 1 };
-            int lhs = x[0] * expressions[i][0] + x[1] * expressions[i][1] + x[2] * expressions[i][2];
-            int rhs = y[0] * expressions[i][3] + y[1] * expressions[i][4] + y[2] * expressions[i][5];
-
-            if (lhs == rhs) {
-                correctCount++;
-            }
-        }
-
-        // Print the number of times the expression is correct for all mappings
-        printf("Expression %d is correct %d times\n", i, correctCount);
-    }
-
-    return 0;
+    // Free the top-level pointer
+    free(L);
 }
+
+int main() {
+#if 0
+    int S[] = {0x7, 0x0, 0x6, 0x4,
+		   0x5, 0x2, 0x1, 0x3};  // Example S-box (replace with actual values)
+    int n = 3;  // Example number of input bits
+    int m = 3;  // Example number of output bits
 #endif
+#if 1
+	int S[] = {0xA, 0x8, 0xF, 0x4,
+               0x2, 0x9, 0xE, 0xD,
+               0xC, 0xB, 0x6, 0x0,
+               0x5, 0x1, 0x3, 0x7};  // Example S-box (replace with actual values)
+    int n = 4;  // Example number of input bits
+    int m = 4;  // Example number of output bits
+#endif
+    print_lat(S, n, m);
+	
+	return 0;
+}

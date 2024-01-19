@@ -251,6 +251,150 @@ If $S:\F_2^n\to\F_2^n$ is a bijective S-Box and $n>1$ then the entries of the LA
 \end{proof}
 \newpage
 \section{Complexity}
+Note that there are $2^n$ possible choices of $\alpha$ and $2^m$ possible choices of $\beta$. Therefore, there are $2^n\cdot 2^m=2^{n+m}$ possible equations: \[
+(\alpha\cdot x)\oplus(\beta\cdot S(x))=0.
+\] There are $2^n$ possible inputs $x\in\F_2^n$ to each equation. So, to calculate the LAT of a S-Box will require $2^{n+m}\cdot 2^n=2^{2n+m}$ calculations.
+
+For example if $n=m=8$ this gives $2^{3n}=2^{3\cdot 8}=2^{24}=16,777,216$ possibilities to look at (which is no problem computationally).
+
+\section{Coding the LAT}
+\subsection{Dot Product}
+\begin{lstlisting}[style=C]
+int dot(int u, int v) {
+	int w = u & v;
+	int dot = 0;
+	
+	// Using Kernighan's algorithm to count the number of set bits
+	while (w) {
+		dot ^= 1;
+		w &= w - 1;  // clear the least significant bit set
+	}
+	
+	return dot;
+}
+int main() {
+	
+	int u = 0b101010;  // Example binary numbers
+	int v = 0b110100;
+	
+	// Dot product: 1
+	printf("Dot product: %d\n", dot(u, v));
+	
+	return 0;
+}
+\end{lstlisting}
+
+\newpage
+\begin{lstlisting}[style=C]
+// S is a list of integers that gives the values of the S-Box
+// n = number of input bits of the S-Box S
+// alpha is the input mask
+// beta is the output mask
+int bias_integer(int S[], int alpha, int beta, int n) {
+	int e = 0;
+	int range = 1 << n;  // 2 ** n
+	
+	for (int x = 0; x < range; x++) {
+		if (dot(alpha, x) ^ dot(beta, S[x]) == 0) {
+			e++;
+		}
+	}
+	
+	return e - (range >> 1);  // range / 2 or 2 ** (n - 1)
+}
+
+int main() {
+	// Example S-box (replace with actual values)
+	int S[] = {1, 2, 3, 4, 5, 6, 7, 8};  
+	int n = 3;  // Example number of input bits
+	int alpha = 0b101;  // Example input mask
+	int beta = 0b110;  // Example output mask
+	
+	// Bias integer: 2
+	printf("Bias integer: %d\n", bias_integer(S, alpha, beta, n));
+	return 0;
+}
+\end{lstlisting}
+
+\newpage
+\begin{lstlisting}[style=C]
+// LAT = linear approximation table
+// S = S-Box
+// n = number of input bits
+// m = number of output bits
+int** lat(int S[], int n, int m) {
+	int n_range = 1 << n;
+	int m_range = 1 << m;
+	
+	// Dynamically allocate 2D array
+	int** L = (int**)malloc(n_range * sizeof(int*));
+	for (int i = 0; i < n_range; i++) {
+		L[i] = (int*)malloc(m_range * sizeof(int));
+	}
+	
+	// Compute the LAT
+	for (int alpha = 0; alpha < n_range; alpha++) {
+		for (int beta = 0; beta < m_range; beta++) {
+			L[alpha][beta] = bias_integer(S, alpha, beta, n);
+		}
+	}
+	
+	return L;
+}
+
+int main() {
+	// Example S-box (replace with actual values)
+	int S[] = {1, 2, 3, 4, 5, 6, 7, 8};  
+	int n = 3;  // Example number of input bits
+	int m = 3;  // Example number of output bits
+	
+	int** L = lat(S, n, m);
+	
+	// Print LAT matrix
+	for (int i = 0; i < (1 << n); i++) {
+		for (int j = 0; j < (1 << m); j++) {
+			printf("%d ", L[i][j]);
+		}
+		printf("\n");
+		free(L[i]);  // Free memory for each row
+	}
+	free(L);  // Free the top-level pointer
+	
+	return 0;
+}
+\end{lstlisting}
+\newpage
+\begin{lstlisting}[style=C]
+void print_lat(int S[], int n, int m) {
+	int n_range = 1 << n;
+	int m_range = 1 << m;
+	int** L = lat(S, n, m);
+	
+	for (int alpha = 0; alpha < n_range; alpha++) {
+		for (int beta = 0; beta < m_range; beta++) {
+			printf("%2d ", L[alpha][beta]);  // %2d ensures numbers are right-aligned in a field of width 2
+		}
+		printf("\n");
+		
+		// Free memory for each row
+		free(L[alpha]);
+	}
+	
+	// Free the top-level pointer
+	free(L);
+}
+
+int main() {
+	int S[] = {1, 2, 3, 4, 5, 6, 7, 8};  // Example S-box (replace with actual values)
+	int n = 3;  // Example number of input bits
+	int m = 3;  // Example number of output bits
+	
+	print_lat(S, n, m);
+	
+	return 0;
+}
+\end{lstlisting}
+
 
 \newpage
 \section{S-Box Analysis}
