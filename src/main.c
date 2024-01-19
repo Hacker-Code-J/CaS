@@ -53,8 +53,8 @@ int** lat(int* S, int n, int m) {
 	// Compute the LAT
 	for (int alpha = 0; alpha < n_range; alpha++) {
 		for (int beta = 0; beta < m_range; beta++) {
-			L[alpha][beta] = success(S, alpha, beta, n);
-			// L[alpha][beta] = bias_integer(S, alpha, beta, n);
+			// L[alpha][beta] = success(S, alpha, beta, n);
+			L[alpha][beta] = bias_integer(S, alpha, beta, n);
 		}
 	}
 	
@@ -97,6 +97,24 @@ void print_lat(int* S, int n, int m) {
     free(L);
 }
 
+void parsing_lat(int* S, int n, int m) {
+    int n_range = 1 << n;
+    int m_range = 1 << m;
+    int** L = lat(S, n, m);
+    for (int alpha = 0; alpha < n_range; alpha++) {
+        for (int beta = 0; beta < m_range; beta++) {
+            printf("%02d ", L[alpha][beta]);  // Right-align numbers in a field of width 2
+        }
+        printf("\n");
+
+        // Free memory for each row
+        free(L[alpha]);
+    }
+
+    // Free the top-level pointer
+    free(L);
+}
+
 int main() {
 #if 0
     int S[] = {0x7, 0x0, 0x6, 0x4,
@@ -112,7 +130,8 @@ int main() {
     int n = 4;  // Example number of input bits
     int m = 4;  // Example number of output bits
 #endif
-    print_lat(S, n, m);
+    // print_lat(S, n, m);
+    parsing_lat(S, n, m);
 	
 	return 0;
 }

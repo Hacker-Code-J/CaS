@@ -45,5 +45,5 @@ rebuild: clean all
 lat:
 	(cd bin && ./SBOX_LAT > SBOX_LAT.txt)
 	(cd bin && mv SBOX_LAT.txt ../view/)
-	(cd view && python3 SBOX_LAT.py)
+	(cd view && python3 lat.py)
 	
