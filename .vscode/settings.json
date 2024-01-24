@@ -63,7 +63,8 @@
     "sbox_lat.h": "c",
     "stdint.h": "c",
     "utils.h": "c",
-    "string.h": "c"
+    "string.h": "c",
+    "toycipher.h": "c"
   },
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#65c89b",

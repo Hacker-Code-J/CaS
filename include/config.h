@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+// #if __STDC_VERSION__ >= 199901L
+// #define _XOPEN_SOURCE 600
+// #else
+// #define _XOPEN_SOURCE 500
+// #endif /* __STDC_VERSION__ */
+
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
