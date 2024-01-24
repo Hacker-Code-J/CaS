@@ -9,6 +9,7 @@ INCDIR=./include
 # Object files
 OBJS=$(OBJDIR)/utils.o \
 	 $(OBJDIR)/sbox_lat.o \
+	 $(OBJDIR)/toycipher.o \
 	 $(OBJDIR)/main.o
 
 # Executable
@@ -38,6 +39,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 # Dependencies
 $(OBJDIR)/utils.o: $(SRCDIR)/utils.c $(INCDIR)/utils.h
 $(OBJDIR)/sbox_lat.o: $(SRCDIR)/sbox_lat.c $(INCDIR)/sbox_lat.h
+$(OBJDIR)/toycipher.o: $(SRCDIR)/toycipher.c $(INCDIR)/toycipher.h
 
 # Clean up
 clean:
