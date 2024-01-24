@@ -59,7 +59,9 @@
   "files.associations": {
     "stdio.h": "c",
     "linear_analysis.h": "c",
-    "config.h": "c"
+    "config.h": "c",
+    "sbox_lat.h": "c",
+    "stdint.h": "c"
   },
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#65c89b",

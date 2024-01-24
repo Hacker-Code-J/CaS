@@ -47,8 +47,8 @@ fn lat(s: &[i32], n: usize, m: usize) -> Vec<Vec<i32>> {
     // Compute the LAT
     for alpha in 0..n_range {
         for beta in 0..m_range {
-            l[alpha][beta] = success(s, alpha as i32, beta as i32, n as i32);
-            // l[alpha][beta] = bias_integer(s, alpha as i32, beta as i32, n as i32);
+            // l[alpha][beta] = success(s, alpha as i32, beta as i32, n as i32);
+            l[alpha][beta] = bias_integer(s, alpha as i32, beta as i32, n as i32);
         }
     }
 

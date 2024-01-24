@@ -1,0 +1,327 @@
+\chapter{Linear Cryptanalysis}
+
+%What type of attack is differential cryptanalysis?
+%\begin{itemize}
+%	\item known-plaintext attack (X)
+%	\item statistical attack (O)
+%	\item algebraic attack (X)
+%	\item ciphertext-only attack (X)
+%\end{itemize}
+
+\section*{Overview}
+\begin{itemize}
+	\item Proposed by Matsui[Mat93]
+	\item Broke DES with $2^{47}$ known plaintext-ciphertext pairs
+	\item One of two major statistical attack techniques and design criteria for block ciphers (and other primitives)
+\end{itemize}
+\vspace{4pt}
+\begin{itemize}
+	\item Main idea:
+\begin{enumerate}
+	\item Find approximate equation about XOR of selected bits $M_i$, $C_i$ and $K_i$.
+	\item Use equation as distinguisher to recover the key
+\end{enumerate}
+\end{itemize}
+
+
+\section{Linear Approximations and Characteristics}
+\begin{quote}
+``Finding paths through the cipher''
+\end{quote}\
+\paragraph{Approximating non-linear functions by linear functions}
+
+\begin{center}
+\begin{minipage}{.48\textwidth}\centering
+\begin{tikzpicture}
+	% Nodes
+	\node (x) at (-1,1) {$x$};
+	\node (y) at (1,1) {$y$};
+	\node[] (dot) at (0,0) {$\odot$};
+	\node (z) at (0,-1) {$z = x \odot y$};
+	
+	% Arrows
+	\draw[-{Latex}] (x) -- (dot);
+	\draw[-{Latex}] (y) -- (dot);
+	\draw[-{Latex}] (dot) -- (z);
+	% Caption
+	\node[align=center, text width=8cm] at (0, 1.75) {
+		AND-gate
+	};
+\end{tikzpicture}
+\end{minipage}
+\begin{minipage}{.48\textwidth}\centering
+	\renewcommand{\arraystretch}{1.25}
+	\begin{tabular}{cc|c|cccc}
+		\toprule[1.2pt]
+		\multicolumn{2}{c|}{Input} & Output &
+		\multicolumn{4}{c}{Linear Functions} \\
+		$x$ & $y$ & $z=x\odot y$ & $0$ & $x$ & $y$ & $x\oplus y$\\
+		\hline
+		0 & 0 & \textcolor{blue}{0} & \textcolor{green}{0} & \textcolor{green}{0} & \textcolor{green}{0} & 0 \\
+		0 & 1 & \textcolor{blue}{0} & \textcolor{green}{0} & \textcolor{green}{0} & 1 & \textcolor{red}{1} \\
+		1 & 0 & \textcolor{blue}{0} & \textcolor{green}{0} & 1 & \textcolor{green}{0} & \textcolor{red}{1} \\
+		1 & 1 & \textcolor{blue}{1} & 0 & \textcolor{green}{1} & \textcolor{green}{1} & \textcolor{red}{0} \\
+		\hline
+		\multicolumn{3}{c|}{Probability} &
+		$\frac{3}{4}$ &
+		$\frac{3}{4}$ &
+		$\frac{3}{4}$ &
+		$\frac{1}{4}$ \\
+		\bottomrule[1.2pt]
+	\end{tabular}
+\end{minipage}
+\end{center}
+
+We get four different equally efficient approximations for $z=x\odot y$ that are correct with probability $\frac{3}{4}$: \[
+z\approx 0,\quad z\approx x,\quad z\approx y,\quad z\approx x\oplus y\oplus 1.
+\] 
+
+\newpage
+\paragraph{Linear Approximation of S-Boxes}
+\begin{example}
+An output bit of the PRESENT S-Box:
+
+\begin{table}[h!]\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{c||c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c}
+\hline
+$x$    & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & A & B & C & D & E & F \\
+\hline
+$S(x)$ & C & 5 & 6 & B & 9 & 0 & A & D & 3 & E & F & 8 & 4 & 7 & 1 & 2\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{center}
+\begin{tikzpicture}[>=Latex, node distance=1cm and 0cm]
+% Nodes for inputs x
+\node (x1) {\textcolor{red}{$x_1$}};
+\node (x2) [right=of x1] {$x_2$};
+\node (x3) [right=of x2] {$x_3$};
+\node (x4) [right=of x3] {\textcolor{red}{$x_4$}};
+
+% S-Box
+\node (S) [draw, minimum size=3cm, below=of x2, xshift=0.3cm] {S};
+
+% Nodes for outputs y
+\node (y1) [below=of S, xshift=-1cm] {$y_1$};
+\node (y2) [right=of y1] {$y_2$};
+\node (y3) [right=of y2] {$y_3$};
+\node (y4) [right=of y3] {\textcolor{red}{$y_4$}};
+
+% Arrows from x to S
+\draw[->] (x1) -- (x1|-S.north);
+\draw[->] (x2) -- (x2|-S.north);
+\draw[->] (x3) -- (x3|-S.north);
+\draw[->] (x4) -- (x4|-S.north);
+
+% Arrows from S to y (ensuring alignment with x_i nodes)
+\draw[->] (S.south-|x1) -- (x1|-y1.north);
+\draw[->] (S.south-|x2) -- (x2|-y2.north);
+\draw[->] (S.south-|x3) -- (x3|-y3.north);
+\draw[->] (S.south-|x4) -- (x4|-y4.north);
+\end{tikzpicture}
+\end{center}
+\begin{table}[h!]\centering
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{cccc|cccc|c}
+	\hline
+	$x_1$ & $x_2$ & $x_3$ & $x_4$ & $y_1$ & $y_2$ & $y_3$ & $y_4$ & $y_4=x_1\oplus x_4$ \\
+	\hline
+	0 & 0 & 0 & 0 & 1 & 1 & 0 & 0 & \textcolor{green}{\checkmark}\\
+	0 & 0 & 0 & 1 & 0 & 1 & 0 & 1 & \textcolor{green}{\checkmark}\\
+	0 & 0 & 1 & 0 & 0 & 1 & 1 & 0 & \textcolor{green}{\checkmark}\\
+	0 & 0 & 1 & 1 & 1 & 0 & 1 & 1 & \textcolor{green}{\checkmark}\\
+	0 & 1 & 0 & 0 & 1 & 0 & 0 & 1 & \textcolor{red}{\xmark}\\
+	0 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & \textcolor{red}{\xmark}\\
+	0 & 1 & 1 & 0 & 1 & 0 & 1 & 0 & \textcolor{green}{\checkmark}\\
+	0 & 1 & 1 & 1 & 1 & 1 & 0 & 1 & \textcolor{green}{\checkmark}\\
+	1 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & \textcolor{green}{\checkmark}\\
+	1 & 0 & 0 & 1 & 1 & 1 & 1 & 0 & \textcolor{green}{\checkmark}\\
+	1 & 0 & 1 & 0 & 1 & 1 & 1 & 1 & \textcolor{green}{\checkmark}\\
+	1 & 0 & 1 & 1 & 1 & 0 & 0 & 0 & \textcolor{green}{\checkmark}\\
+	1 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & \textcolor{red}{\xmark}\\
+	1 & 1 & 0 & 1 & 0 & 1 & 1 & 1 & \textcolor{red}{\xmark}\\
+	1 & 1 & 1 & 0 & 0 & 0 & 0 & 1 & \textcolor{green}{\checkmark}\\
+	1 & 1 & 1 & 1 & 0 & 0 & 1 & 0 & \textcolor{green}{\checkmark}\\
+	\hline
+\end{tabular}
+\end{table}
+\end{example}
+
+\newpage
+\paragraph{Linear Masks}
+\begin{itemize}
+	\item We are interested in \textit{any} linear equation of $n$ input and $n$ output bits.
+	\item Select bits with \textbf{masks} $\alpha,\beta\in\F_2^n$ and the \textbf{inner product} \[
+	\alpha\cdot x:=\bigoplus_{i=1}^n(\alpha_i\odot x_i).
+	\] \textcolor{gray}{Alternative notion: $\alpha\cdot x^T$ or $\inner{\alpha,x}$ or $\ell_{\alpha}(x)$}
+	\item Linear approximation: \[
+	\alpha\cdot x=\beta\cdot S(x).
+	\]
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[>=Latex, node distance=1cm and 0cm]
+	% Alpha vector
+	\node (a1) at (0,1) {\textcolor{red}{1}};
+	\node (a2) [right=of a1] {0};
+	\node (a3) [right=of a2] {0};
+	\node (a4) [right=of a3] {1};
+	\node (alpha) [left=of a1] {$\alpha$};
+	
+	% Nodes for inputs x
+	\node (x1) [below=of a1] {\textcolor{red}{$x_1$}};
+	\node (x2) [right=of x1] {$x_2$};
+	\node (x3) [right=of x2] {$x_3$};
+	\node (x4) [right=of x3] {\textcolor{red}{$x_4$}};
+	
+	% S-Box
+	\node (S) [draw, minimum size=3cm, below=of x2, xshift=0.3cm] {S};
+	
+	% Nodes for outputs y
+	\node (y1) [below=of S, xshift=-1cm] {$y_1$};
+	\node (y2) [right=of y1] {$y_2$};
+	\node (y3) [right=of y2] {$y_3$};
+	\node (y4) [right=of y3] {\textcolor{red}{$y_4$}};
+	
+	% Beta vector
+	\node (b1) [below=of y1] {\textcolor{red}{1}};
+	\node (b2) [right=of b1] {0};
+	\node (b3) [right=of b2] {0};
+	\node (b4) [right=of b3] {1};
+	\node (beta) [left=of b1] {$\beta$};
+	
+	% Arrows from alpha to x
+	\draw[->] (a1) -- (x1);
+	\draw[->] (a2) -- (x2);
+	\draw[->] (a3) -- (x3);
+	\draw[->] (a4) -- (x4);
+	
+	% Arrows from x to S
+	\draw[->] (x1) -- (x1|-S.north);
+	\draw[->] (x2) -- (x2|-S.north);
+	\draw[->] (x3) -- (x3|-S.north);
+	\draw[->] (x4) -- (x4|-S.north);
+	
+	% Arrows from S to y (ensuring alignment with x_i nodes)
+	\draw[->] (S.south-|x1) -- (y1);
+	\draw[->] (S.south-|x2) -- (y2);
+	\draw[->] (S.south-|x3) -- (y3);
+	\draw[->] (S.south-|x4) -- (y4);
+	
+	% Arrows from y to beta
+	\draw[->] (y1) -- (b1);
+	\draw[->] (y2) -- (b2);
+	\draw[->] (y3) -- (b3);
+	\draw[->] (y4) -- (b4);
+	
+	% Box around S
+	\draw (S.north west) rectangle (S.south east);
+	
+	% Labels for S(x) and S(x)
+	\node at (S.south) [below] {$S(x)$};
+\end{tikzpicture}
+\end{center}
+
+\newpage
+\paragraph{Measuring the Quality of the Approximation: Bias \& co.}
+
+\begin{itemize}
+	\item The quality of the approximation $(\alpha,\beta)$ of the $n$-bit S-Box $S$ can be desribed equivalently using the following metrics:
+	\begin{itemize}
+		\item \textbf{Solutions} \[
+		e_{\alpha,\beta}=\#\Sigma_{\alpha,\beta}=\#\set{x\in\F_2^n:\alpha\cdot x=\beta\cdot S(x)}
+		\]
+		\item \textbf{Probability} \[
+		p=\mathbb{P}_x\left[\alpha\cdot x=\beta\cdot S(x)\right]=\frac{e_{\alpha,\beta}}{2^n}
+		\]
+		\item \textbf{Bias} \[
+		\epsilon=p-\frac{1}{2}
+		\]
+		\item \textbf{Correlation} \[
+		\eta_\epsilon=2\cdot\epsilon.
+		\]
+	\end{itemize}
+	\item For $y_4=x_1\oplus x_4$, we have \begin{align*}
+	e_{\alpha,\beta} &= 12\\
+	p&=\frac{12}{16}\\
+	\epsilon&=\frac{12}{16}-1=\frac{1}{4}\\
+	\eta_\epsilon &= 2\cdot\frac{1}{4}=2^{-1}.
+	\end{align*}
+	\item Assume we have a linear approximation $\alpha\cdot x=\beta\cdot S(x)$ that holds with bias $\epsilon:$
+	\begin{itemize}
+		\item If $\epsilon=0$, we learn nothing (as good as random guess, correct half the time)
+		\item If $\epsilon>0$, the approximation $\alpha\cdot x=\beta\cdot S(x)$ is good
+		\item If $\epsilon<0$, the approximation $\alpha\cdot x=\beta\cdot S(x)\oplus 1$ is good
+	\end{itemize}
+\end{itemize}
+
+\newpage
+\section{Linear Approximations of (Affine) Linear Functions}
+
+Consider a linear function (\eg, part of the diffusion layer) \[
+y=\mathcal{L}(x).
+\] Then any approximation is either perfect ($\eta_\epsilon=\pm 1$) or useless ($\eta_\epsilon=0$). Which approximations $(\alpha,\beta)$ are good?
+
+Write $\mathcal{L}$ as a matrix multiplication $y=\mathcal{L}=L\cdot x$, then \[
+\eta_\epsilon(\alpha,\beta)=\begin{cases}
+	1 &: \alpha=L^T\cdot\beta \\
+	0 &: \text{else}.
+\end{cases}
+\] If $\mathcal{L}$ is affine linear (linear function $\oplus$ constant), the correlation may be $\pm 1$, depending on the constant. In particular, the key addition in a key-alternating cipher may change sign $\pm 1$.
+
+\myparagraph{Key Addition + S-Box}
+\\
+Linear Approximation: \[
+(\alpha\cdot x)\oplus(\kappa\cdot k)=\beta\cdot y.
+\]
+Then \[
+x_1\oplus x_4\oplus k_1\oplus k_4 = y_4\quad\text{or}\quad x_1\oplus x_4\oplus y_4 =k_1\oplus k_4
+\]
+1-bit equation about the key!
+
+\myparagraph{Key Addition + S-Box + Key Addition + S-Box}
+\\
+Linear Approximation: \[
+\begin{cases}
+(\alpha\cdot x)\oplus(\kappa\cdot k)=\beta\cdot y\\
+x_1\oplus x_4\oplus k_1\oplus k_4 = y_4
+\end{cases}\quad\text{and}\quad\begin{cases}
+(\beta\cdot y)\oplus(\kappa'\cdot k')=\gamma\cdot z\\
+y_4\oplus k_4'=z_2\oplus z_4
+\end{cases}
+\] implies \[
+\begin{cases}
+(\alpha\cdot x)\oplus(\kappa\cdot k)\oplus(\kappa'\cdot k')=\gamma\cdot z\\
+x_1\oplus x_4\oplus k_1\oplus k_4\oplus k_4' = z_2\oplus z_4
+\end{cases}
+\]
+
+\myparagraph{What's the Bias of this Approximation?}
+
+The two approximations hold with probabilities \begin{align*}
+p_1&=\frac{1}{2}+\epsilon_1=\frac{1}{2}+\frac{4}{16}=\frac{3}{4},\\
+p_2&=\frac{1}{2}+\epsilon_2=\frac{1}{2}-\frac{4}{16}=\frac{1}{4}.
+\end{align*}
+
+The combined approximation is correct if  both are correct or both are wrong; so, assuming the two probabilities are independent:
+\begin{align*}
+p &= p_1\cdot p_2 + (1-p_1)\cdot(1-p_2)\\
+&= 2\cdot p_1\cdot p_2-p_1-p_2+1\\
+&= 2\cdot\left(\frac{1}{2}+\epsilon_1\right)\cdot\left(\frac{1}{2}+\epsilon_2\right)-\left(\frac{1}{2}+\epsilon_1\right)-\left(\frac{1}{2}+\epsilon_2\right)+1\\
+&=\frac{1}{2}+2\cdot\epsilon_1\cdot\epsilon_2.
+\end{align*}
+
+\begin{tcolorbox}[colback=white,colframe=lemcolor,arc=5pt,title={\color{white}\bf Piling-up Lemma}]
+\begin{lemma}
+Let $X_i$ ($1\leq i\leq n$) be independent Boolean expressions (corresponding to the individual approximations) with probabilities $p_i=\Pr[X_i=0]=\frac{1}{2}+\epsilon_i$. Then \[
+\Pr[X_1\oplus X_2\oplus\cdots\oplus X_n=0]=\frac{1}{2}+2^{n-1}\prod_{i=1}^n\epsilon_i.
+\] Or in terms of the correlation $\eta_\epsilon=2\cdot\epsilon$: \[
+\eta=\prod_{i=1}^n\eta_i.
+\]
+\end{lemma}
+\end{tcolorbox}
+
+
+

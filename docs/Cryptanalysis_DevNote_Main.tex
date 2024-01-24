@@ -6,6 +6,7 @@
 \usepackage{enumerate}
 \usepackage{soul} % highlight
 \usepackage{lipsum}  % Just for generating text
+\usepackage{pifont}% http://ctan.org/pkg/pifont
 
 % Theorem
 \newtheorem{axiom}{Axiom}[chapter]
@@ -208,6 +209,7 @@
 	urlcolor=titleblue,
 }
 
+\newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}\\}
 \newcommand{\mathcolorbox}[2]{\colorbox{#1}{$\displaystyle #2$}}
 
 \newcommand{\F}{\mathbb{F}}
@@ -246,9 +248,15 @@
 \newcommand{\state}{\mathsf{state}}
 
 \newcommand{\ie}{\textnormal{i.e.}}
+\newcommand{\eg}{\textnormal{e.g.}}
 
 \newcommand{\yes}{\textcolor{blue}{O}}
 \newcommand{\no}{\textcolor{red}{X}}
+
+\newcommand{\inner}[1]{\left\langle #1\right\rangle}
+\newcommand{\xmark}{\ding{55}}%
+
+\newcommand{\Corr}{\operatorname{\textnormal Corr}}
 
 \begin{document}	
 	% Title page
@@ -280,6 +288,7 @@
 	\newpage
 	\mainmatter
 	\input{chapters/chapter1.tex} % The Linear Approximation Table
+	\input{chapters/chapter2.tex} % Linear Cryptanalysis
 	% Include more chapters as needed
 	
 	\appendix
