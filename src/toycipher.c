@@ -2,10 +2,10 @@
 #include "utils.h"
 
 // Brute Force Attack to find the key
-void brute_force_toy1(u8* S, u8 pairs[][2], size_t n_pairs, size_t BIT) {
+void brute_force_toy1(u8* S, u8 pairs[][2], size_t n_pairs, size_t SBOX_SIZE) {
     u64 start, end;
     start = rdtsc();
-    for (size_t key = 0; key < BIT; key++) {
+    for (size_t key = 0; key < SBOX_SIZE; key++) {
         int match = 1;  // Flag to check if the key is correct for all pairs
 
         for (size_t i = 0; i < n_pairs; i++) {
@@ -33,20 +33,20 @@ void brute_force_toy1(u8* S, u8 pairs[][2], size_t n_pairs, size_t BIT) {
     printf("Elapsed time: %llu cycles\n", (unsigned long long)(end - start));
 }
 
-void toy1_3bit_brute_force(u8* S, u8 pairs[][2], size_t n_pairs) {
+void toy1_3SBOX_SIZE_brute_force(u8* S, u8 pairs[][2], size_t n_pairs) {
     brute_force_toy1(S, pairs, n_pairs, 8);
 }
 
-void toy1_4bit_brute_force(u8* S, u8 pairs[][2], size_t n_pairs) {
+void toy1_4SBOX_SIZE_brute_force(u8* S, u8 pairs[][2], size_t n_pairs) {
     brute_force_toy1(S, pairs, n_pairs, 16);
 }
 
 // Dictionary-based Implementation to find the key
-void dictionary_toy1(u8* S, u8 pairs[][2], size_t n_pairs, size_t BIT) {
+void dictionary_toy1(u8* S, u8 pairs[][2], size_t n_pairs, size_t SBOX_SIZE) {
     // Precompute the S-BOX output for each key and input
-    u8 dictionary[BIT][BIT];
-    for (int key = 0; key < BIT; key++) {
-        for (int input = 0; input < BIT; input++) {
+    u8 dictionary[SBOX_SIZE][SBOX_SIZE];
+    for (int key = 0; key < SBOX_SIZE; key++) {
+        for (int input = 0; input < SBOX_SIZE; input++) {
             dictionary[key][input] = key ^ S[input ^ key];
         }
     }
@@ -54,9 +54,9 @@ void dictionary_toy1(u8* S, u8 pairs[][2], size_t n_pairs, size_t BIT) {
     u64 start, end;
     start = rdtsc();
     // Check for each input/output pair
-    for (int key = 0; key < BIT; key++) {
+    for (int key = 0; key < SBOX_SIZE; key++) {
         int match = 1;  // Flag to check if the key is correct for all pairs
-        for (int i = 0; i < BIT; i++) {
+        for (int i = 0; i < SBOX_SIZE; i++) {
             u8 P = pairs[i][0];
             u8 C = pairs[i][1];
             if (dictionary[key][P] != C) {
@@ -79,10 +79,10 @@ void dictionary_toy1(u8* S, u8 pairs[][2], size_t n_pairs, size_t BIT) {
     printf("Elapsed time: %llu cycles\n", (unsigned long long)(end - start));
 }
 
-void toy1_3bit_dictionary(u8* S, u8 pairs[][2], size_t n_pairs) {
+void toy1_3SBOX_SIZE_dictionary(u8* S, u8 pairs[][2], size_t n_pairs) {
     dictionary_toy1(S, pairs, n_pairs, 8);
 }
 
-void toy1_4bit_dictionary(u8* S, u8 pairs[][2], size_t n_pairs) {
+void toy1_4SBOX_SIZE_dictionary(u8* S, u8 pairs[][2], size_t n_pairs) {
     dictionary_toy1(S, pairs, n_pairs, 16);
 }
