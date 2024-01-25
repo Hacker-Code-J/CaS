@@ -37,10 +37,10 @@ int main() {
     toy1_4bit_brute_force(S_4bit, pairs_4bit, n_pairs_4bit);
     puts("");
 
-    toy1_3bit_dictionary(S_3bit, pairs_3bit, n_pairs_3bit);
-    puts("");
-    toy1_4bit_dictionary(S_4bit, pairs_4bit, n_pairs_4bit);
-    puts("");
+    // toy1_3bit_dictionary(S_3bit, pairs_3bit, n_pairs_3bit);
+    // puts("");
+    // toy1_4bit_dictionary(S_4bit, pairs_4bit, n_pairs_4bit);
+    // puts("");
 #endif
 
 #if 0 /* 4-bit Toy-cipher Analysis */
