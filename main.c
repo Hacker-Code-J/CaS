@@ -88,8 +88,8 @@ int main() {
     };
     size_t n_pairs2_4bit = sizeof(pairs2_4bit) / sizeof(pairs2_4bit[0]);
 
-    u8 dictionary2_3bit[64]; // 2^2 + 2^4 = 20
-    u8 dictionary2_4bit[256]; // 2^16 + 2^16 = 64
+    u8 dictionary2_3bit[2 * 64]; // 2^2 + 2^4 = 20
+    u8 dictionary2_4bit[2 * 256]; // 2^16 + 2^16 = 64
 
     puts("Brute Force for 3-bit Toy-cipher2:");
     toy2_3bit_brute_force(S_3bit, pairs2_3bit, n_pairs2_3bit);

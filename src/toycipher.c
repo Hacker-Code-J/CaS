@@ -150,18 +150,15 @@ void toy2_4bit_brute_force(u8* S, u8 pairs[][4], size_t n_pairs) {
 
 void generate_dictionary2(u8* dictionary, size_t* dict_size, size_t SBOX_SIZE) {
     size_t index = 0;
-    size_t max_index = SBOX_SIZE * SBOX_SIZE;  // Maximum number of key pairs
+    size_t max_index = 2 * SBOX_SIZE * SBOX_SIZE;  // Maximum number of key pairs
     u8 shift = (SBOX_SIZE == 8) ? 3 : 4;
-    for (size_t k1 = 0; k1 < ((SBOX_SIZE == 8) ? 4 : 32); k1++) {
+    for (size_t k1 = 0; k1 < SBOX_SIZE; k1++) {
         for (size_t k2 = 0; k2 < 16; k2++) {
             if (index >= max_index) {
                 break;  // Prevent buffer overflow
             }
 
             // printf("k1: %2lx, k2: %2lx K: %2lx\n", k1, k2, (k1 << shift) | k2);
-            // if (((k1 << shift) | k2) == 0xF0) {
-            //     printf("0xF0 is included at index %zu\n", index);
-            // }
 
             dictionary[index++] = (k1 << shift) | k2;
         }
