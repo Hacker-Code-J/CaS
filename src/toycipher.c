@@ -133,6 +133,9 @@ void toy1_4bit_dictionary(u8* S, u8 pairs[][2], size_t n_pairs) {
  * C2 = SBOX(P2 xor K2) xor SBOX(P1 xor K1) xor K1
 */
 void brute_force_toy2(u8* S, u8 pairs[][4], size_t n_pairs, size_t SBOX_SIZE) {
+    u64 start, end;
+    
+    start = rdtsc();
     for (size_t k1 = 0; k1 < SBOX_SIZE; k1++) {
         for (size_t k2 = 0; k2 < SBOX_SIZE; k2++) {
             int match = 1;  // Flag to check if the keys are correct for all pairs
@@ -151,13 +154,25 @@ void brute_force_toy2(u8* S, u8 pairs[][4], size_t n_pairs, size_t SBOX_SIZE) {
                 }
             }
 
+            i8 shift = (SBOX_SIZE == 8) ? 3 : 4;
             if (match) {
+                end = rdtsc();
                 // If the keys are correct for all pairs, print the keys
-                printf("Keys found: K1 = 0x%02lx, K2 = 0x%02lx and so K= 0x%02lx\n", k1, k2, (k1 << 3) | k2);
+                printf("Keys found: K1 = 0x%02lx, K2 = 0x%02lx and so K = 0x%02lx\n", k1, k2, (k1 << shift) | k2);
+                printf("%llu cycles\n", (unsigned long long)(end - start));
                 return;  // Exit the function as the keys are found
             }
         }
     }
+    end = rdtsc();
     // If no keys are found (which is unlikely in a properly set scenario), print a message
     printf("No key pairs match all the given input/output pairs.\n");
+    printf("%llu cycles\n", (unsigned long long)(end - start));
+}
+
+void toy2_3bit_brute_force(u8* S, u8 pairs[][4], size_t n_pairs) {
+    brute_force_toy2(S, pairs, n_pairs, 8);
+}
+void toy2_4bit_brute_force(u8* S, u8 pairs[][4], size_t n_pairs) {
+    brute_force_toy2(S, pairs, n_pairs, 16);
 }
