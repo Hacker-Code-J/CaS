@@ -1,19 +1,5 @@
 #include "config.h"
 
-// Hash Table Structure
-// typedef struct {
-//     u8 key;   // Actual key used in the cipher
-//     u8 used; // Flag to check if the slot is used
-// } HashTableEntry;
-
-// // Simple hash function (identity function, assuming no collisions for this toy example)
-// static inline u8 HASH(u8 value) {
-//     return value;
-// }
-
-// // Function to precompute the hash table
-// void precomputeHashTable(u8* S, size_t SBOX_SIZE);
-
 /* ToyCipher1 - Brute Force */
 void brute_force_toy1(u8* S, u8 pairs[][2], size_t n_pairs, size_t SBOX_SIZE);
 

@@ -17,7 +17,7 @@ void brute_force_toy1(u8* S, u8 pairs[][2], size_t n_pairs, size_t SBOX_SIZE) {
             // Apply the relationship C = K xor SBOX(P xor K)
             if ((key ^ S[P ^ key]) != C) {
                 match = 0;  // If any pair does not match, this key is not correct
-                break;
+                // break;
             }
         }
 
