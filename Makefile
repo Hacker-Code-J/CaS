@@ -8,8 +8,7 @@ INCDIR=./include
 
 # Object files
 OBJS=$(OBJDIR)/utils.o \
-	 $(OBJDIR)/sbox_lat.o \
-	 $(OBJDIR)/toycipher.o \
+	 $(OBJDIR)/toycipher2.o \
 	 $(OBJDIR)/main.o
 
 # Executable
@@ -38,8 +37,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 # Dependencies
 $(OBJDIR)/utils.o: $(SRCDIR)/utils.c $(INCDIR)/utils.h
-$(OBJDIR)/sbox_lat.o: $(SRCDIR)/sbox_lat.c $(INCDIR)/sbox_lat.h
-$(OBJDIR)/toycipher.o: $(SRCDIR)/toycipher.c $(INCDIR)/toycipher.h
+$(OBJDIR)/toycipher2.o: $(SRCDIR)/toycipher2.c $(INCDIR)/toycipher2.h
 
 # Clean up
 clean:
@@ -52,8 +50,8 @@ dir:
 
 rebuild: clean all
 
-lat:
-	(cd bin && ./a.out > a.out.txt)
-	(cd bin && mv SBOX_LAT.txt ../view/)
-	(cd view && python3 lat.py)
+# lat:
+# 	(cd bin && ./a.out > a.out.txt)
+# 	(cd bin && mv SBOX_LAT.txt ../view/)
+# 	(cd view && python3 lat.py)
 	
