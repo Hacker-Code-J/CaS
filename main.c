@@ -45,34 +45,26 @@ int main() {
 
     puts("Brute Force for 3-bit Toy-cipher1:");
     toy1_3bit_brute_force(S_3bit, pairs_3bit, n_pairs_3bit);
+    puts("");
 
-    puts("\nBrute Force for 4-bit Toy-cipher1:");
+    // Dictionary generation (if applicable)
+    puts("Dictionary for 3-bit Toy-cipher1:");
+    u8 dictionary_3bit[8];
+    toy1_3bit_dictionary(S_3bit, pairs_3bit, n_pairs_3bit, dictionary_3bit);
+    puts("");
+
+    puts("================================================================\n");
+
+    puts("Brute Force for 4-bit Toy-cipher1:");
     toy1_4bit_brute_force(S_4bit, pairs_4bit, n_pairs_4bit);
     puts("");
 
-    // toy1_3bit_dictionary(S_3bit, pairs_3bit, n_pairs_3bit);
-    // puts("");
-    // toy1_4bit_dictionary(S_4bit, pairs_4bit, n_pairs_4bit);
-    // puts("");
+    puts("Dictionary for 4-bit Toy-cipher1:");
+    u8 dictionary_4bit[16];
+    toy1_4bit_dictionary(S_4bit, pairs_4bit, n_pairs_4bit, dictionary_4bit);
+    puts("");
 
-    // // Dynamically allocate memory for the dictionary
-    // u8** dictionary_3bit = (u8**)malloc(8 * sizeof(u8*));
-    // for (size_t i = 0; i < 8; i++) {
-    //     dictionary_3bit[i] = (u8*)malloc(8 * sizeof(u8));
-    // }
-
-    // // Create the dictionary
-    // create_dictionary(S_3bit, dictionary_3bit, 8);
-    
-    // // Search for the key
-    // search_key(dictionary_3bit, pairs_3bit, n_pairs_3bit, 8);
-
-    // // Free the dynamically allocated memory
-    // for (size_t i = 0; i < 8; i++) {
-    //     free(dictionary_3bit[i]);
-    // }
-    // free(dictionary_3bit);
-
+    puts("================================================================\n");
 #endif
 
 #if 1 /* Toy-cipher2 Analysis */
@@ -96,11 +88,26 @@ int main() {
     };
     size_t n_pairs2_4bit = sizeof(pairs2_4bit) / sizeof(pairs2_4bit[0]);
 
+    u8 dictionary2_3bit[2 * 64]; // 2^2 + 2^4 = 20
+    u8 dictionary2_4bit[2 * 256]; // 2^16 + 2^16 = 64
+
     puts("Brute Force for 3-bit Toy-cipher2:");
     toy2_3bit_brute_force(S_3bit, pairs2_3bit, n_pairs2_3bit);
+    puts("");
+
+    puts("Dictionary for 3-bit Toy-cipher2:");
+    toy2_3bit_dictionary(S_3bit, pairs2_3bit, n_pairs2_3bit, dictionary2_3bit);
+    puts("");
+
+    puts("================================================================\n");
 
     puts("\nBrute Force for 4-bit Toy-cipher2:");
     toy2_4bit_brute_force(S_4bit, pairs2_4bit, n_pairs2_4bit);
+    puts("");
+
+    puts("Dictionary for 4-bit Toy-cipher2:");
+    toy2_4bit_dictionary(S_4bit, pairs2_4bit, n_pairs2_4bit, dictionary2_4bit);
+    puts("");
 
 #endif
 
@@ -108,11 +115,13 @@ int main() {
  * CaS Study 1 (20240113)
 */
 
-#if 0 /* 3-bit S-Box LAT */
+#if 1 /* 3-bit S-Box LAT */
     int S[] = {0x7, 0x0, 0x6, 0x4,
 		   0x5, 0x2, 0x1, 0x3};  // Example S-box (replace with actual values)
     int n = 3;  // Example number of input bits
     int m = 3;  // Example number of output bits
+
+    print_lat(S, n, m);
 #endif
 
 #if 0 /* 4-bit S-Box LAT */
