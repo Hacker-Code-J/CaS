@@ -50,8 +50,8 @@ dir:
 
 rebuild: clean all
 
-# lat:
-# 	(cd bin && ./a.out > a.out.txt)
-# 	(cd bin && mv SBOX_LAT.txt ../view/)
-# 	(cd view && python3 lat.py)
+lat:
+	(cd bin && ./a.out > SBOX_LAT.txt)
+	(cd bin && mv SBOX_LAT.txt ../view/)
+	(cd view && python3 lat.py)
 	

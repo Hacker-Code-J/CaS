@@ -22,18 +22,13 @@ static inline u8 dot(u8 u, u8 v) {
     return dot;
 }
 
+
+u8 success(const u8* S, u8 alpha, u8 beta, u8 n);
 i8 bias_integer(const u8* S, u8 alpha, u8 beta, u8 n);
+
 i8** LAT(const u8* S, u8 n, u8 m);
 void print_SBOX2_LAT(void);
-
-typedef struct {
-    u8 alpha;
-    u8 beta;
-} Index;
-void addIndex(Index** list, u8 alpha, u8 beta, int* size, int* capacity);
-Index* findAllMaxAbsIndices(const u8* S, u8 n, u8 m, int* count);
-
-void findIdx(void);
+void visual_SBOX2_LAT(void);
 
 
 #endif /* _TOYCIPHER2_H */
