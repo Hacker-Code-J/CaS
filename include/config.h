@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 // #if __STDC_VERSION__ >= 199901L
 // #define _XOPEN_SOURCE 600
