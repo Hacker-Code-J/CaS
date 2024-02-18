@@ -7,8 +7,8 @@ SRCDIR=./src
 INCDIR=./include
 
 # Object files
-OBJS=$(OBJDIR)/utils.o \
-	 $(OBJDIR)/toycipher2.o \
+OBJS=$(OBJDIR)/utils.o $(OBJDIR)/lat.o\
+	 $(OBJDIR)/toy_cipher3.o \
 	 $(OBJDIR)/main.o
 
 # Executable
@@ -24,20 +24,12 @@ all: dir $(TARGET)
 $(TARGET): $(OBJS)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-# Rule for compiling main source files to main object files
-$(OBJDIR)/main.o: main.c $(INCDIR)/config.h
-	$(CC) $(CFLAGS) -c main.c -o $@
-
 # Rule for compiling source files to object files
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
 
 # Include automatically generated dependencies
 -include $(OBJS:.o=.d)
-
-# Dependencies
-$(OBJDIR)/utils.o: $(SRCDIR)/utils.c $(INCDIR)/utils.h
-$(OBJDIR)/toycipher2.o: $(SRCDIR)/toycipher2.c $(INCDIR)/toycipher2.h
 
 # Clean up
 clean:
@@ -49,6 +41,9 @@ dir:
 	@mkdir -p $(OBJDIR) $(BINDIR)
 
 rebuild: clean all
+
+run:
+	(cd bin && ./a.out)
 
 lat:
 	(cd bin && ./a.out > SBOX_LAT.txt)
