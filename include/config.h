@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <x86intrin.h> // for __rdtscp and __rdtsc
+#include <inttypes.h> // for PRIu64 macro
 
 // #if __STDC_VERSION__ >= 199901L
 // #define _XOPEN_SOURCE 600
